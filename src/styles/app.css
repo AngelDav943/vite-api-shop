@@ -1,0 +1,14 @@
+.item {
+  padding: 2em;
+  height: 6em;
+  display: none;
+  gap:2em;
+}
+
+.item img {
+  height: 100%;
+}
+
+.item.show {
+  display: flex;
+}
