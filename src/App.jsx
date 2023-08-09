@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import useFetch from 'react-fetch-hook'
 
+import Card from './components/card';
 import Item from './components/item';
 
 import './styles/app.css'
 import './styles/item.css'
+import './styles/cards.css'
 
 export default function() {
   const { data: catalog } = useFetch(
@@ -16,7 +18,7 @@ export default function() {
   );
 
   function displayCategory(category) {
-    var items = document.querySelectorAll(`.item`)
+    var items = document.querySelectorAll(`.card`)
 
     items.forEach(item => {
       if (item.getAttribute("category") == category) {
@@ -24,6 +26,15 @@ export default function() {
       } else {
         item.classList.remove("show")
       }
+    })
+  }
+
+  function displaySearch(search)
+  {
+    var items = document.querySelectorAll(".card")
+
+    items.forEach(item => {
+      
     })
   }
 
@@ -42,10 +53,13 @@ export default function() {
 
       <main>
         { catalog && catalog.map(({id, image, title, category, description, rating, price}) => (
-          <Item key={id} title={title} description={description} price={price} category={category} image={image} rating={rating}>
-          </Item>
+          <Card key={id} src={image} name={title} price={price} category={category} rating={rating} description={description}/>
+          /*<Item key={id} title={title} description={description} price={price} category={category} image={image} rating={rating}>
+          </Item>*/
         ))}
       </main>
+
+
 
     </>
   )

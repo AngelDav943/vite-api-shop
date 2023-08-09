@@ -26,4 +26,6 @@ header button {
 
 main {
   padding: 1em;
+  display: flex;
+  flex-wrap: wrap;
 }
