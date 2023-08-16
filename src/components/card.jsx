@@ -17,14 +17,17 @@ export default function(props) {
     }
 
     return (
-        <div className="card" id={props.name} category={props.category} onClick={spin}>
+        <div key={current} className="card show" id={current} name={props.name} price={props.price} rating={props.rating.rate} category={props.category} onClick={spin}>
             <div className="face front">
                 <div className="image">
                     <img src={props.src} alt="IMAGE" />
                 </div>
                 <div className="data">
-                    <p>{props.name}</p>
-                    <p>${props.price}</p>
+                    <p className='title'>{String(props.name).slice(0,54) + (String(props.name).length > 56 ? "..." : "") }</p>
+                    <div className='row'>
+                        <span>${props.price}</span>
+                        <span> <img src="src/assets/images/star.png" alt="" /> {props.rating.rate} ({props.rating.count})</span>
+                    </div>
                 </div>
             </div>
             <div className="face back">
