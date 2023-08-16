@@ -32,6 +32,8 @@ export default function() {
     'https://fakestoreapi.com/products/categories'
   );
 
+  console.log(catalog)
+
   function sort(attribute, isAscending) {
 
     if (attribute != undefined) setSorting(attribute)
@@ -75,19 +77,12 @@ export default function() {
     var items = document.querySelectorAll(`.card`)
 
     items.forEach(item => {
-      if (item.getAttribute("category") == category) {
+      if (item.getAttribute("category") == category || category == "all") {
         item.classList.add("show")
       } else {
         item.classList.remove("show")
       }
     })
-  }
-
-  function toggleSearch(override)
-  {
-    setSearching(!searching)
-    if (override != null) setSearching(override)
-    displaySearch()
   }
 
   function toggleFilter()
@@ -147,6 +142,7 @@ export default function() {
             <label>
               <span>Category:</span>
               <select name="selection" onChange={(e) => {displayCategory(e.target.value)}}>
+                <option value="all">All</option>
                 {(
                   categories && categories.map((category) => {
                     return <option key={category} value={category} >{category}</option>
