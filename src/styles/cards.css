@@ -38,6 +38,7 @@
 .card .front {
     background-color: #b6b6e6;
     transform: rotateY(0deg);
+    overflow: hidden;
 }
 
 .card .back {
@@ -73,17 +74,61 @@
     width: 100%;
 
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
 
     transition: background-color 0.8s;
+    transition: height .7s;
+    transition: .5s height;
 }
 
-.image img {
+.card .buttons {
+    width: 80%;
+    transition: all 0.5s;
+    height: 0px;
+
+    display: flex;
+    flex-direction: row;
+    margin: 0.5em 10%;
+}
+
+.card .buttons button, .card .buttons input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden;
+}
+
+.card .buttons input {
+    width: 50%;
+}
+
+.card .buttons button.amount {
+    background-color: white;
+    color: black;
+    width: max-content;
+}
+
+.card button.amount:hover {
+    color: white;
+    background-color: black;
+}
+
+.card button.buy {
+    background-color: green;
+    color: white;
+}
+
+.card button.buy:hover {
+    color: green;
+    background-color: white;
+}
+
+.card .image img {
     border-top-left-radius: 0.5em;
     border-top-right-radius: 0.5em;
 
-    opacity: 0.3;
+    opacity: 0.7;
     width: 90%;
     height: 70%;
 
@@ -92,11 +137,16 @@
     transition: all 0.8s;
 }
 
-.front:hover > .image {
+.card .front:hover > .image {
     background-color: white;
+    height: 9em;
 }
 
-.front:hover > .image img {
+.card .front:hover > .buttons {
+    height: 2em;
+}
+
+.card .front:hover > .image img {
     opacity: 1;
     height: 90%;
 }
@@ -113,30 +163,46 @@
     display: inline;
 }
 
-.data {
+.card .data {
     padding: 1em 2em;
     text-align: left;
     overflow: auto;
     max-width: 100%;
 }
 
-.data p {
+.card .data p {
     margin: 0.5em 0px;
 }
 
-.data p.title {
+.card .data p.title {
     height: 3.5em;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.data .row {
+.card .data .row {
     display: flex;
     justify-content: space-between;
 }
 
-.data span img {
+.card .data span img {
     object-fit: contain;
     height: 1em;
     width: 1em;
+}
+
+@media (hover: none),(-moz-touch-enabled: 1), (pointer:coarse) {
+    .card .image {
+        background-color: white;
+        height: 9em !important;
+    }
+
+    .buttons {
+        height: 2em !important;
+    }
+
+    .card .image img {
+        opacity: 1;
+        height: 90% !important;
+    }
 }

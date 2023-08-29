@@ -7,6 +7,8 @@ import Item from './components/item';
 import './styles/app.css'
 import './styles/item.css'
 import './styles/cards.css'
+import './styles/cart.css'
+import Cart from './components/cart';
 
 function searchMatches(string, target) {
   let result = 0
@@ -18,11 +20,10 @@ function searchMatches(string, target) {
   return result
 }
 
-export default function() {
-  var [searching, setSearching] = useState(false);
-
+export default function () {
+  var [currentCategory, setCategory] = useState("all")
   var [ascending, setAscending] = useState(true);
-  var [sorting, setSorting] = useState("price");
+  var [total, setTotal] = useState(0);
 
   const { data: catalog } = useFetch(
     'https://fakestoreapi.com/products'
@@ -32,36 +33,26 @@ export default function() {
     'https://fakestoreapi.com/products/categories'
   );
 
-  console.log(catalog)
+  function sort() {
+    var sorting = document.getElementById("sortType").value;
+    var isAscending = ascending
 
-  function sort(attribute, isAscending) {
-
-    if (attribute != undefined) setSorting(attribute)
-    if (isAscending != undefined) setAscending(isAscending)
-
-    console.log(sorting, ascending)
-
-    var index = 0
-    var shouldSwitch;
+    var index, cards, shouldSwitch;
     var list = document.getElementById("catalog");
     var switching = true;
 
     while (switching) {
       switching = false;
-      let cards = list.querySelectorAll(".card");
+      cards = list.querySelectorAll(".card");
       for (index = 0; index < (cards.length - 1); index++) {
         shouldSwitch = false;
         let card = cards[index];
         let nextCard = cards[index + 1]
 
-        let cardSort = Number(card.getAttribute("sort"))
-        let nextCardSort = Number(card.getAttribute("sort"))
+        let cardSort = Number(card.getAttribute(sorting))// + Number(card.getAttribute("sort"))
+        let nextCardSort = Number(nextCard.getAttribute(sorting))// + Number(card.getAttribute("sort"))
 
-        let canSwitch = Number(card.getAttribute(sorting)) + cardSort > Number(nextCard.getAttribute(sorting)) + nextCardSort // ascending
-
-        if (ascending == false) canSwitch = Number(card.getAttribute(sorting)) - cardSort < Number(nextCard.getAttribute(sorting)) - nextCardSort // descending
-
-        if (canSwitch) {
+        if ((!isAscending && cardSort > nextCardSort) || (isAscending && nextCardSort > cardSort)) {
           shouldSwitch = true;
           break;
         }
@@ -76,6 +67,8 @@ export default function() {
   function displayCategory(category) {
     var items = document.querySelectorAll(`.card`)
 
+    setCategory(category)
+
     items.forEach(item => {
       if (item.getAttribute("category") == category || category == "all") {
         item.classList.add("show")
@@ -85,14 +78,7 @@ export default function() {
     })
   }
 
-  function toggleFilter()
-  {
-    let filterdiv = document.getElementById("search-filter")
-    if (filterdiv) filterdiv.classList.toggle("hidden")
-  }
-
-  function displaySearch()
-  {
+  function displaySearch() {
     var input = document.getElementById("search_input")
     if (!input) return;
 
@@ -102,10 +88,10 @@ export default function() {
     let biggest = 0
 
     items.forEach(item => {
-      var found = searchMatches(toSearch,item.getAttribute("name")) || (toSearch.replaceAll(" ","") == "") ? 1 : undefined
+      var found = searchMatches(toSearch, item.getAttribute("name")) || (toSearch.replaceAll(" ", "") == "") ? 1 : undefined
       item.setAttribute("sort", found)
       if (found > biggest) biggest = found
-      if (found) {
+      if (found && (item.getAttribute("category") == currentCategory || currentCategory == "all")) {
         item.classList.add("show")
       } else {
         item.classList.remove("show")
@@ -119,29 +105,106 @@ export default function() {
         }
       })
     }
+    sort();
+  }
 
-    //sort("sort");
+  function toggleFilter() {
+    let filterdiv = document.getElementById("filter")
+    let cartdiv = document.getElementById("cart")
+    if (!filterdiv || !cartdiv) return
+
+    let status = filterdiv.classList.contains("hidden")
+    if (status) {
+      filterdiv.classList.remove("hidden")
+      cartdiv.classList.add("hidden")
+    } else {
+      filterdiv.classList.add("hidden")
+      cartdiv.classList.add("hidden")
+    }
+  }
+
+  function toggleCart() {
+    let filterdiv = document.getElementById("filter")
+    let cartdiv = document.getElementById("cart")
+    if (!filterdiv || !cartdiv) return
+
+    let status = cartdiv.classList.contains("hidden")
+    if (status) {
+      filterdiv.classList.add("hidden")
+      cartdiv.classList.remove("hidden")
+    } else {
+      filterdiv.classList.add("hidden")
+      cartdiv.classList.add("hidden")
+    }
+  }
+
+  var [cart, setCart] = useState([]);
+  function addItem(item, newkey) {
+    let duplicate = cart.find(target => target.id == item.id)
+
+    console.log(item)
+    let amount = item.amount || 1
+    var newitem = { ...item, key: newkey, amount: duplicate == undefined ? amount : (duplicate.amount + (amount)) }
+    var newCart = [...cart, newitem]
+
+    if (duplicate != undefined) {
+      newCart = cart
+      newCart[cart.indexOf(duplicate)] = newitem
+      console.log(newitem)
+    }
+
+    let total = 0
+    for (let i = 0; i < newCart.length; i++) {
+      total = total + (newCart[i].price * newCart[i].amount)
+    }
+
+    setTotal(total)
+    setCart(newCart)
+  }
+
+  function removeItem(index) {
+    var newCart = [...cart]
+
+    console.log(newCart[index])
+    if (newCart[index].amount <= 1) {
+      newCart.splice(index, 1)
+    }
+
+    if (newCart[index]) {
+      newCart[index].amount -= 1
+    }
+
+    let total = 0
+    for (let i = 0; i < newCart.length; i++) {
+      total = total + (newCart[i].price * newCart[i].amount)
+    }
+
+    setTotal(total)
+    setCart(newCart)
   }
 
   return (
     <>
       <header>
-        <button className='image' onClick={() => {toggleFilter()}}>
+        <button className='image' onClick={toggleFilter}>
           <img src='src/assets/images/search.png'></img>
         </button>
 
-        <button className='image'>
+        <button className='image' onClick={toggleCart}>
           <img src='src/assets/images/cart.png'></img>
+          {(
+            cart.length > 0 && (<span>{cart.length}</span>)
+          )}
         </button>
       </header>
 
-      <div id='search-filter' className='hidden'>
-        <input type="text" className='expanded' id="search_input" onChange={() => {displaySearch()}} placeholder='Search'/>
+      <div id='filter' className='tab hidden'>
+        <input type="text" className='expanded' id="search_input" onChange={() => { displaySearch() }} placeholder='Search' />
         <div className='row'>
           <div className='column'>
             <label>
               <span>Category:</span>
-              <select name="selection" onChange={(e) => {displayCategory(e.target.value)}}>
+              <select name="selection" onChange={(e) => { displayCategory(e.target.value) }}>
                 <option value="all">All</option>
                 {(
                   categories && categories.map((category) => {
@@ -150,25 +213,43 @@ export default function() {
                 )}
               </select>
             </label>
+          </div>
+
+          <div className='column right' id='isAscending' onChange={(e) => { }}>
             <label>
               <span>Sort by</span>
-              <select name="selection" onChange={(e) => {sort(e.target.value, undefined)}}>
-                  <option value="price">Price</option>
-                  <option value="rating">Rating</option>
+              <select name="selection" id='sortType' onChange={(e) => { }}>
+                <option value="price">Price</option>
+                <option value="rating">Rating</option>
               </select>
             </label>
-          </div>
-
-          <div className='column right' onChange={(e) => {sort(undefined, (String(e.target.value) == "true"))}}>
-            <label>Ascending<input type="radio" name="ascending" value={true}/></label>
-            <label>Descending<input type="radio" name="ascending" value={false}/></label>
+            <label>Ascending<input type="radio" name="ascending" onClick={(e) => { setAscending(true) }} defaultChecked /></label>
+            <label>Descending<input type="radio" name="ascending" onClick={(e) => { setAscending(false) }} /></label>
+            <button onClick={(e) => { sort() }}>Apply filter</button>
           </div>
         </div>
+
       </div>
 
+      <main id="cart" className="tab hidden">
+        <p>Total: {Math.floor((total * 100)) / 100}$</p>
+        {cart && cart.map((data, index) => (
+          <Cart
+            key={String(index) + String(data.key)}
+            src={data.src}
+            name={data.name}
+            price={data.price}
+            category={data.category}
+            rating={data.rating}
+            description={data.description}
+            amount={data.amount}
+            onClick={() => { removeItem(index) }} />
+        ))}
+      </main>
+
       <main id='catalog'>
-        { catalog && catalog.map(({id, image, title, category, description, rating, price}) => (
-          <Card key={id} src={image} name={title} price={price} category={category} rating={rating} description={description}/>
+        {catalog && catalog.map(({ id, image, title, category, description, rating, price }) => (
+          <Card key={id} id={id} src={image} name={title} price={price} category={category} rating={rating} description={description} onClick={addItem} />
         ))}
       </main>
 
