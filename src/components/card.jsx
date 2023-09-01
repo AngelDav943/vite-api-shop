@@ -41,7 +41,7 @@ export default function(props) {
                 </div>
                 <div className='buttons'>
                     <button className="buy" onClick={buy}>
-                        Buy {amount} (${Math.floor((props.price * amount) * 100) / 100})
+                        Buy {amount || 1} (${Math.floor((props.price * (amount || 1)) * 100) / 100})
                     </button>
                     <input className='amount' type="number" onChange={updateAmount} />
 

@@ -64,21 +64,8 @@ export default function () {
     }
   }
 
-  function displayCategory(category) {
-    var items = document.querySelectorAll(`.card`)
-
-    setCategory(category)
-
-    items.forEach(item => {
-      if (item.getAttribute("category") == category || category == "all") {
-        item.classList.add("show")
-      } else {
-        item.classList.remove("show")
-      }
-    })
-  }
-
-  function displaySearch() {
+  function displaySearch(category) {
+    category = category || currentCategory
     var input = document.getElementById("search_input")
     if (!input) return;
 
@@ -91,7 +78,7 @@ export default function () {
       var found = searchMatches(toSearch, item.getAttribute("name")) || (toSearch.replaceAll(" ", "") == "") ? 1 : undefined
       item.setAttribute("sort", found)
       if (found > biggest) biggest = found
-      if (found && (item.getAttribute("category") == currentCategory || currentCategory == "all")) {
+      if (found && (item.getAttribute("category") == category || category == "all")) {
         item.classList.add("show")
       } else {
         item.classList.remove("show")
@@ -106,6 +93,22 @@ export default function () {
       })
     }
     sort();
+  }
+
+  function displayCategory(category) {
+    var items = document.querySelectorAll(`.card`)
+
+    setCategory(category)
+
+    items.forEach(item => {
+      if (item.getAttribute("category") == category || category == "all") {
+        item.classList.add("show")
+      } else {
+        item.classList.remove("show")
+      }
+    })
+
+    displaySearch(category)
   }
 
   function toggleFilter() {
