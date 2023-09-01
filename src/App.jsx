@@ -138,11 +138,19 @@ export default function () {
     }
   }
 
+  function newTotal(newCart) {
+    let total = 0
+    for (let i = 0; i < newCart.length; i++) {
+      total = total + (newCart[i].price * newCart[i].amount)
+    }
+
+    setTotal(total)
+  }
+
   var [cart, setCart] = useState([]);
   function addItem(item, newkey) {
     let duplicate = cart.find(target => target.id == item.id)
 
-    console.log(item)
     let amount = item.amount || 1
     var newitem = { ...item, key: newkey, amount: duplicate == undefined ? amount : (duplicate.amount + (amount)) }
     var newCart = [...cart, newitem]
@@ -150,37 +158,25 @@ export default function () {
     if (duplicate != undefined) {
       newCart = cart
       newCart[cart.indexOf(duplicate)] = newitem
-      console.log(newitem)
     }
 
-    let total = 0
-    for (let i = 0; i < newCart.length; i++) {
-      total = total + (newCart[i].price * newCart[i].amount)
-    }
-
-    setTotal(total)
     setCart(newCart)
+    newTotal(newCart)
   }
 
-  function removeItem(index) {
+  function removeItem(index, all) {
     var newCart = [...cart]
 
-    console.log(newCart[index])
-    if (newCart[index].amount <= 1) {
+    if (all == true || (all == false && newCart[index].amount <= 1)) {
       newCart.splice(index, 1)
     }
 
-    if (newCart[index]) {
+    if (all == false && newCart[index]) {
       newCart[index].amount -= 1
     }
 
-    let total = 0
-    for (let i = 0; i < newCart.length; i++) {
-      total = total + (newCart[i].price * newCart[i].amount)
-    }
-
-    setTotal(total)
     setCart(newCart)
+    newTotal(newCart)
   }
 
   return (
@@ -243,7 +239,7 @@ export default function () {
             rating={data.rating}
             description={data.description}
             amount={data.amount}
-            onClick={() => { removeItem(index) }} />
+            onClick={(all) => { removeItem(index, all) }} />
         ))}
       </main>
 

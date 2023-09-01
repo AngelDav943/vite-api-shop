@@ -7,7 +7,11 @@ export default function(props) {
     const current = useId()
 
     const click = function(event) {
-        if (props.onClick) props.onClick({...props, amount: num})
+        if (props.onClick) props.onClick(false)
+    }
+
+    const clickall = function(event) {
+        if (props.onClick) props.onClick(true)
     }
 
     return (
@@ -19,6 +23,9 @@ export default function(props) {
                 <span>${props.price * props.amount}</span>
             </div>
             <button className='image' onClick={click}>
+                <img src='src/assets/images/minus.png'></img>
+            </button>
+            <button className='image' onClick={clickall}>
                 <img src='src/assets/images/unchecked.png'></img>
             </button>
         </div>
